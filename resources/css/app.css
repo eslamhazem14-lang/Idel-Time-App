@@ -1,0 +1,72 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../../app/**/*.php';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --color-bg: #0B0D10;
+    --color-surface: #12161C;
+    --color-surface-2: #171C24;
+    --color-surface-3: #1D232D;
+    --color-line: #232A35;
+    --color-line-strong: #2F3845;
+    --color-ink: #F5F7FA;
+    --color-ink-2: #C7CEDA;
+    --color-muted: #8B95A5;
+    --color-faint: #5B6574;
+    --color-primary: #7C5CFC;
+    --color-primary-hover: #8F73FF;
+    --color-primary-soft: #7C5CFC1F;
+    --color-secondary: #22C55E;
+    --color-secondary-soft: #22C55E1A;
+    --color-amber: #F5B942;
+    --color-danger: #F2555A;
+}
+
+@layer base {
+    html { color-scheme: dark; -webkit-font-smoothing: antialiased; }
+    body { @apply bg-bg text-ink font-sans; font-feature-settings: 'cv11', 'ss01'; }
+    ::selection { background: #7C5CFC55; }
+    [x-cloak] { display: none !important; }
+    :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+    input[type='number']::-webkit-inner-spin-button { opacity: .4; }
+}
+
+@utility card { @apply rounded-xl border border-line bg-surface; }
+@utility card-pad { @apply p-5; }
+@utility label { @apply mb-1.5 block text-xs font-medium tracking-wide text-ink-2; }
+@utility field {
+    @apply block w-full rounded-lg border border-line bg-bg px-3 py-2 text-sm text-ink placeholder:text-faint transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/25 disabled:opacity-60;
+}
+@utility field-error { @apply border-danger/70; }
+@utility btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium whitespace-nowrap transition disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-primary { @apply btn bg-primary text-white shadow-[0_0_0_1px_#ffffff14_inset] hover:bg-primary-hover; }
+@utility btn-secondary { @apply btn border border-line-strong bg-surface-2 text-ink hover:bg-surface-3; }
+@utility btn-ghost { @apply btn text-ink-2 hover:bg-surface-2 hover:text-ink; }
+@utility btn-success { @apply btn bg-secondary text-bg hover:brightness-110; }
+@utility btn-danger { @apply btn border border-danger/40 bg-danger/10 text-danger hover:bg-danger/20; }
+@utility btn-sm { @apply px-2.5 py-1.5 text-xs; }
+@utility btn-lg { @apply px-5 py-2.5 text-[15px]; }
+@utility table {
+    @apply w-full text-left text-sm;
+    & th { @apply border-b border-line px-4 py-2.5 text-xs font-medium tracking-wider text-muted uppercase; }
+    & td { @apply border-b border-line/60 px-4 py-3 align-middle; }
+    & tbody tr { @apply transition hover:bg-surface-2/60; }
+}
+@utility prose-task {
+    @apply text-sm leading-relaxed text-ink-2;
+}
+@utility code-block { @apply overflow-x-auto rounded-lg border border-line bg-bg p-4 font-mono text-[13px] leading-relaxed text-ink-2; }
+@utility mono-num { font-variant-numeric: tabular-nums; }
+@utility grid-bg {
+    background-image: linear-gradient(to right, #ffffff08 1px, transparent 1px), linear-gradient(to bottom, #ffffff08 1px, transparent 1px);
+    background-size: 48px 48px;
+}

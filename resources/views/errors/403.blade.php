@@ -1,0 +1,1 @@
+@include('errors.layout', ['code' => '403', 'title' => 'Access denied', 'text' => ($exception ?? null)?->getMessage() && ($exception->getMessage() !== 'This action is unauthorized.') ? $exception->getMessage() : 'You don\'t have permission to view this page.'])
