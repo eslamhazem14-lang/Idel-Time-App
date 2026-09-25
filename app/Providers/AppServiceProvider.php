@@ -52,6 +52,7 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('drafts', fn (Request $request) => Limit::perMinute(30)->by($key($request)));
         RateLimiter::for('withdrawals', fn (Request $request) => Limit::perHour(5)->by($key($request)));
         RateLimiter::for('reports', fn (Request $request) => Limit::perHour(20)->by($key($request)));
+        RateLimiter::for('ads', fn (Request $request) => Limit::perMinute(12)->by($key($request)));
         RateLimiter::for('api', fn (Request $request) => Limit::perMinute(120)->by($key($request)));
     }
 }

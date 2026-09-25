@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\AdViewStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\ReportReason;
 use App\Enums\ReportStatus;
@@ -14,6 +15,7 @@ use App\Models\TaskClaim;
 use App\Models\TaskSubmission;
 use App\Models\TaskTemplate;
 use App\Models\User;
+use App\Services\AdRewardService;
 use App\Services\DepositService;
 use App\Services\DisputeService;
 use App\Services\SubmissionReviewService;
@@ -63,6 +65,7 @@ class DatabaseSeeder extends Seeder
         $tasks = $this->tasks($requesters, $categories, $admin, $start);
         $this->simulateWork($developers, $tasks, $start);
         $this->extras($developers, $requesters, $admin, $tasks);
+        $this->adViews($developers, $admin);
 
         Carbon::setTestNow();
         $this->command?->info('Demo data seeded. Wallet reconciliation: '.(app(WalletService::class)->reconcile() === [] ? 'OK' : 'MISMATCH'));
@@ -282,5 +285,26 @@ class DatabaseSeeder extends Seeder
             'description' => 'Took me about twice the estimated time on mobile.',
             'status' => ReportStatus::Open,
         ]);
+    }
+
+    /** Watched ads: last month's were paid out from a (fictional) ad network payment, this month's await payout. */
+    private function adViews(array $developers, User $admin): void
+    {
+        $lastMonth = now()->subMonthNoOverflow()->startOfMonth();
+        foreach (array_slice($developers, 0, 6) as $i => $developer) {
+            foreach ([[$lastMonth, 12 - $i], [now()->startOfMonth(), 6 - $i]] as [$month, $count]) {
+                for ($n = 0; $n < $count; $n++) {
+                    $at = $month->copy()->addDays(mt_rand(0, max(0, min(27, (int) $month->diffInDays(now()) - 1))))->addMinutes(mt_rand(0, 1400));
+                    $developer->adViews()->create([
+                        'uuid' => (string) Str::uuid(), 'provider' => 'demo', 'status' => AdViewStatus::Counted,
+                        'started_at' => $at->copy()->subSeconds(30), 'completed_at' => $at,
+                    ]);
+                }
+            }
+        }
+
+        app(AdRewardService::class)->distribute(
+            $lastMonth, $lastMonth->copy()->endOfMonth(), Money::of('1.20'), $admin, 'DEMO-PAYMENT', 'Demo data: not a real payment.',
+        );
     }
 }

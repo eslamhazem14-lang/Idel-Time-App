@@ -47,6 +47,17 @@
                 </fieldset>
             </section>
             <section class="card card-pad space-y-4 lg:col-span-2">
+                <h2 class="text-sm font-semibold">Watch & earn (video ads)</h2>
+                <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="ads_enabled" value="1" @checked($settings['ads_enabled']) class="rounded border-line bg-bg text-primary"> Enable the Watch & earn page</label>
+                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                    <x-input name="ad_revenue_share_percent" label="Developer share of ad revenue (%)" :value="$settings['ad_revenue_share_percent']" />
+                    <x-input name="ad_estimated_view_value" label="Estimated value per view ($)" :value="$settings['ad_estimated_view_value']" hint="Display only" />
+                    <x-input name="ad_min_watch_seconds" type="number" label="Min watch time (s)" :value="$settings['ad_min_watch_seconds']" />
+                    <x-input name="ad_daily_cap" type="number" label="Ads per developer per day" :value="$settings['ad_daily_cap']" />
+                    <x-input name="ad_cooldown_seconds" type="number" label="Cooldown between ads (s)" :value="$settings['ad_cooldown_seconds']" />
+                </div>
+            </section>
+            <section class="card card-pad space-y-4 lg:col-span-2">
                 <h2 class="text-sm font-semibold">Access</h2>
                 <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="require_email_verification" value="1" @checked($settings['require_email_verification']) class="rounded border-line bg-bg text-primary"> Require verified email to claim, post and withdraw</label>
                 <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="maintenance_mode" value="1" @checked($settings['maintenance_mode']) class="rounded border-line bg-bg text-primary"> <span class="text-amber">Maintenance mode</span> — only admins can use the app; public pages stay online</label>

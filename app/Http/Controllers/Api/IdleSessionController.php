@@ -32,6 +32,8 @@ class IdleSessionController extends Controller
 
         return response()->json([
             'session' => new IdleSessionResource($session),
+            // Page the client should open while the agent works (Watch & earn + matching tasks)
+            'watch_url' => route('developer.watch', ['idle' => $session->id]),
             'recommended_tasks' => TaskResource::collection($browser->recommended($request->user(), $session->expected_minutes)),
         ], 201);
     }

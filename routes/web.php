@@ -82,12 +82,21 @@ Route::middleware(['auth', 'active', 'role:developer', 'maintenance'])->name('de
 
     Route::get('/wallet', [Developer\WalletController::class, 'index'])->name('wallet');
 
+    // Watch & earn (opened by the Claude Code hook while the agent works)
+    Route::get('/watch', [Developer\WatchController::class, 'index'])->name('watch');
+    Route::get('/watch/status', [Developer\WatchController::class, 'status'])->name('watch.status');
+    Route::get('/connect', [Developer\ConnectController::class, 'index'])->name('connect');
+    Route::post('/connect/token', [Developer\ConnectController::class, 'token'])->name('connect.token');
+    Route::delete('/connect/token', [Developer\ConnectController::class, 'revoke'])->name('connect.revoke');
+
     Route::middleware('verified.required')->group(function () {
         Route::post('/tasks/{task}/claim', [Developer\WorkController::class, 'claim'])->middleware('throttle:claims')->name('tasks.claim');
         Route::get('/work/{claim}', [Developer\WorkController::class, 'show'])->name('work.show');
         Route::post('/work/{claim}/submit', [Developer\WorkController::class, 'submit'])->middleware('throttle:submissions')->name('work.submit');
         Route::post('/work/{claim}/draft', [Developer\WorkController::class, 'draft'])->middleware('throttle:drafts')->name('work.draft');
         Route::post('/work/{claim}/release', [Developer\WorkController::class, 'release'])->name('work.release');
+        Route::post('/watch/views', [Developer\WatchController::class, 'start'])->middleware('throttle:ads')->name('watch.start');
+        Route::post('/watch/views/{adView}/complete', [Developer\WatchController::class, 'complete'])->middleware('throttle:ads')->name('watch.complete');
         Route::post('/wallet/withdrawals', [Developer\WalletController::class, 'withdraw'])->middleware('throttle:withdrawals')->name('withdrawals.store');
     });
 });
@@ -192,4 +201,6 @@ Route::middleware(['auth', 'active', 'role:admin'])->prefix('admin')->name('admi
     Route::put('/settings', [Admin\SettingsController::class, 'update'])->name('settings.update');
 
     Route::get('/activity', [Admin\ActivityController::class, 'index'])->name('activity.index');
+    Route::get('/ads', [Admin\AdController::class, 'index'])->name('ads.index');
+    Route::post('/ads/payouts', [Admin\AdController::class, 'distribute'])->name('ads.distribute');
 });

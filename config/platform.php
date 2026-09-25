@@ -47,6 +47,33 @@ return [
         'require_email_verification' => (bool) env('PLATFORM_REQUIRE_EMAIL_VERIFICATION', true),
         'maintenance_mode' => false,
         'maintenance_message' => 'We are performing scheduled maintenance. Please check back shortly.',
+
+        // Rewarded video ads ("Watch & earn" while the AI agent works)
+        'ads_enabled' => (bool) env('ADS_ENABLED', true),
+        // Share of the ad revenue Google pays you that goes to the developers who watched
+        'ad_revenue_share_percent' => env('AD_REVENUE_SHARE_PERCENT', '50.00'),
+        // Rough value of one watched ad to the developer, shown as an ESTIMATE only (never credited)
+        'ad_estimated_view_value' => '0.01',
+        'ad_min_watch_seconds' => 15,
+        'ad_daily_cap' => 20,
+        'ad_cooldown_seconds' => 30,
+    ],
+
+    /*
+    | Ad provider. "demo" plays a built-in placeholder so the flow can be tested
+    | without an ad account; "google_rewarded" uses Google Ad Manager rewarded
+    | web ads (GPT). Demo views only pay out when ads.pay_demo_views is true,
+    | which defaults to false in production so nobody earns from a fake ad.
+    */
+    'ads' => [
+        'provider' => env('AD_PROVIDER', 'demo'),
+        'pay_demo_views' => (bool) env('ADS_PAY_DEMO_VIEWS', env('APP_ENV', 'production') !== 'production'),
+        'google' => [
+            // e.g. /1234567/rewarded_web  (Ad Manager network code + ad unit)
+            'ad_unit_path' => env('GOOGLE_AD_UNIT_PATH'),
+        ],
+        // A started view that is not completed within this window can no longer be rewarded.
+        'view_ttl_minutes' => 30,
     ],
 
     'fraud' => [

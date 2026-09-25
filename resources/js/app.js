@@ -111,5 +111,119 @@ Alpine.data('chart', (config) => ({
     },
 }));
 
+// Watch & earn: agent status + rewarded video ads.
+// cfg = { provider, adUnitPath, minSeconds, state, urls: { status, start, complete } }
+Alpine.data('watchEarn', (cfg) => ({
+    state: cfg.state,
+    phase: 'idle', // idle | loading | playing | verifying | done | error
+    message: '',
+    progress: 0,
+    finishedNotice: false,
+    view: null,
+    timer: null,
+
+    init() {
+        this.wasWorking = this.state.agent.working;
+        this.poll = setInterval(() => this.refresh(), 5000);
+        document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && this.refresh());
+    },
+    destroy() { clearInterval(this.poll); clearInterval(this.timer); },
+
+    get canWatch() { return this.state.enabled && this.state.today < this.state.cap && ['idle', 'done', 'error'].includes(this.phase); },
+
+    async request(url, method = 'GET') {
+        const res = await fetch(url, { method, headers: { Accept: 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content } });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Something went wrong. Please try again.');
+        return data;
+    },
+
+    async refresh() {
+        try {
+            this.state = await this.request(cfg.urls.status);
+        } catch { return; }
+        if (this.wasWorking && !this.state.agent.working) this.agentFinished();
+        this.wasWorking = this.state.agent.working;
+        document.title = (this.state.agent.working ? '● Claude is working — ' : '✓ Claude is done — ') + 'Watch & earn';
+    },
+
+    agentFinished() {
+        this.finishedNotice = true;
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Claude finished', { body: 'Your agent is done — switch back to your terminal.' });
+        }
+    },
+
+    askNotify() { 'Notification' in window && Notification.requestPermission(); },
+
+    async watch() {
+        if (!this.canWatch) return;
+        this.phase = 'loading';
+        this.message = '';
+        try {
+            this.view = (await this.request(cfg.urls.start, 'POST')).view;
+            cfg.provider === 'google_rewarded' ? this.playGoogle() : this.playDemo();
+        } catch (e) { this.fail(e.message); }
+    },
+
+    // Built-in placeholder so the whole flow works without an ad account.
+    playDemo() {
+        this.phase = 'playing';
+        const total = (cfg.minSeconds + 1) * 1000, started = Date.now();
+        this.timer = setInterval(() => {
+            this.progress = Math.min(100, ((Date.now() - started) / total) * 100);
+            if (this.progress >= 100) { clearInterval(this.timer); this.granted(); }
+        }, 200);
+    },
+
+    // Google Ad Manager rewarded web ad (GPT out-of-page REWARDED format).
+    playGoogle() {
+        if (!cfg.adUnitPath) return this.fail('Ads are not configured yet (GOOGLE_AD_UNIT_PATH is empty).');
+        window.googletag = window.googletag || { cmd: [] };
+        if (!document.getElementById('gpt-js')) {
+            const s = document.createElement('script');
+            s.id = 'gpt-js'; s.async = true; s.src = 'https://securepubads.g.doubleclick.net/tag/js/gpt.js';
+            s.onerror = () => this.fail('The ad could not load. Disable your ad blocker for this site and try again.');
+            document.head.appendChild(s);
+        }
+        const gt = window.googletag;
+        gt.cmd.push(() => {
+            const slot = gt.defineOutOfPageSlot(cfg.adUnitPath, gt.enums.OutOfPageFormat.REWARDED);
+            if (!slot) return this.fail('Rewarded ads are not supported in this browser or window size.');
+            slot.addService(gt.pubads());
+            const pubads = gt.pubads();
+            const onReady = (e) => { this.phase = 'playing'; e.makeRewardedVisible(); };
+            const onGranted = () => this.granted();
+            const onClosed = () => { gt.destroySlots([slot]); cleanup(); if (this.phase === 'playing') this.fail('The ad was closed before the reward was earned.'); };
+            const onEmpty = (e) => { if (e.slot === slot && e.isEmpty) { gt.destroySlots([slot]); cleanup(); this.fail('No ad is available right now. Try again in a minute.'); } };
+            const cleanup = () => {
+                pubads.removeEventListener('rewardedSlotReady', onReady);
+                pubads.removeEventListener('rewardedSlotGranted', onGranted);
+                pubads.removeEventListener('rewardedSlotClosed', onClosed);
+                pubads.removeEventListener('slotRenderEnded', onEmpty);
+            };
+            pubads.addEventListener('rewardedSlotReady', onReady);
+            pubads.addEventListener('rewardedSlotGranted', onGranted);
+            pubads.addEventListener('rewardedSlotClosed', onClosed);
+            pubads.addEventListener('slotRenderEnded', onEmpty);
+            gt.enableServices();
+            gt.display(slot);
+        });
+    },
+
+    async granted() {
+        this.phase = 'verifying';
+        try {
+            const data = await this.request(cfg.urls.complete.replace('__VIEW__', this.view), 'POST');
+            this.state = data.state;
+            this.message = data.message;
+            this.phase = 'done';
+        } catch (e) { this.fail(e.message); }
+        this.progress = 0;
+    },
+
+    fail(message) { clearInterval(this.timer); this.progress = 0; this.phase = 'error'; this.message = message; },
+}));
+
 window.Alpine = Alpine;
 Alpine.start();

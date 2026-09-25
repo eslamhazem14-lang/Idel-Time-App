@@ -40,18 +40,24 @@ class SettingsController extends Controller
             'withdrawal_methods' => ['required', 'array', 'min:1'],
             'withdrawal_methods.*' => [Rule::enum(PaymentMethod::class)],
             'maintenance_message' => ['required', 'string', 'max:500'],
+            'ad_revenue_share_percent' => ['required', 'decimal:0,2', 'min:0', 'max:100'],
+            'ad_estimated_view_value' => [...$money],
+            'ad_min_watch_seconds' => ['required', 'integer', 'min:5', 'max:300'],
+            'ad_daily_cap' => ['required', 'integer', 'min:1', 'max:500'],
+            'ad_cooldown_seconds' => ['required', 'integer', 'min:0', 'max:3600'],
         ]);
 
-        foreach (['commission_percent', 'min_reward', 'max_reward', 'min_withdrawal', 'min_deposit'] as $key) {
+        foreach (['commission_percent', 'min_reward', 'max_reward', 'min_withdrawal', 'min_deposit', 'ad_revenue_share_percent', 'ad_estimated_view_value'] as $key) {
             $data[$key] = Money::of((string) $data[$key])->toDecimal();
         }
-        foreach (['min_task_minutes', 'max_task_minutes', 'claim_min_minutes', 'claim_grace_seconds', 'max_active_claims', 'expiry_warning_minutes', 'auto_approve_days'] as $key) {
+        foreach (['min_task_minutes', 'max_task_minutes', 'claim_min_minutes', 'claim_grace_seconds', 'max_active_claims', 'expiry_warning_minutes', 'auto_approve_days', 'ad_min_watch_seconds', 'ad_daily_cap', 'ad_cooldown_seconds'] as $key) {
             $data[$key] = (int) $data[$key];
         }
         $data['claim_duration_multiplier'] = (string) $data['claim_duration_multiplier'];
         $data['withdrawal_methods'] = array_values($data['withdrawal_methods']);
         $data['maintenance_mode'] = $request->boolean('maintenance_mode');
         $data['require_email_verification'] = $request->boolean('require_email_verification');
+        $data['ads_enabled'] = $request->boolean('ads_enabled');
 
         $before = $settings->all();
         $settings->setMany($data);

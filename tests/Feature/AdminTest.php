@@ -17,7 +17,8 @@ class AdminTest extends TestCase
             'min_task_minutes' => 1, 'max_task_minutes' => 15, 'claim_duration_multiplier' => '2', 'claim_min_minutes' => 5,
             'claim_grace_seconds' => 60, 'expired_claim_policy' => 'expire', 'max_active_claims' => 1, 'expiry_warning_minutes' => 2,
             'auto_approve_days' => 3, 'min_withdrawal' => '10.00', 'min_deposit' => '10.00', 'withdrawal_methods' => ['paypal'],
-            'maintenance_message' => 'Back soon.', 'require_email_verification' => '1',
+            'maintenance_message' => 'Back soon.', 'require_email_verification' => '1', 'ads_enabled' => '1',
+            'ad_revenue_share_percent' => '50', 'ad_estimated_view_value' => '0.01', 'ad_min_watch_seconds' => 15, 'ad_daily_cap' => 20, 'ad_cooldown_seconds' => 30,
         ], $overrides);
     }
 

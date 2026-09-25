@@ -40,6 +40,14 @@ php artisan wallet:reconcile        # verify every balance equals its ledger
 
 ---
 
+## Watch & earn and Claude Code
+
+While Claude Code works, a hook opens the **Watch & earn** page, where developers
+watch rewarded video ads. When Google pays the platform, an admin records the
+payment and the developers' share is split by ads watched and credited to their
+wallets. Setup, Google Ad Manager steps and a policy warning:
+[docs/ADS_AND_CLAUDE_CODE.md](docs/ADS_AND_CLAUDE_CODE.md).
+
 ## Documentation
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — domain model, money handling, task lifecycle, design decisions

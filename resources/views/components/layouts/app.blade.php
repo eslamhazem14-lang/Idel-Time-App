@@ -6,7 +6,9 @@
             ['developer.dashboard', 'Dashboard', 'grid', 'developer.dashboard'],
             ['developer.tasks.index', 'Find tasks', 'search', 'developer.tasks.*'],
             ['developer.submissions.index', 'Submissions', 'list', 'developer.submissions.*'],
+            ['developer.watch', 'Watch & earn', 'play', 'developer.watch'],
             ['developer.wallet', 'Wallet', 'wallet', 'developer.wallet'],
+            ['developer.connect', 'Connect Claude Code', 'terminal', 'developer.connect'],
         ],
         \App\Enums\UserRole::Requester => [
             ['requester.dashboard', 'Dashboard', 'grid', 'requester.dashboard'],
@@ -21,6 +23,7 @@
             ['admin.users.index', 'Users', 'users', 'admin.users.*'],
             ['admin.withdrawals.index', 'Withdrawals', 'banknote', 'admin.withdrawals.*'],
             ['admin.deposits.index', 'Deposits', 'wallet', 'admin.deposits.*'],
+            ['admin.ads.index', 'Ad revenue', 'play', 'admin.ads.*'],
             ['admin.disputes.index', 'Disputes', 'scale', 'admin.disputes.*'],
             ['admin.reports.index', 'Reports', 'flag', 'admin.reports.*'],
             ['admin.fraud.index', 'Fraud signals', 'shield', 'admin.fraud.*'],

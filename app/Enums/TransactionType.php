@@ -12,6 +12,8 @@ enum TransactionType: string
     case Deposit = 'deposit';
     case TaskEscrow = 'task_escrow';
     case TaskPayment = 'task_payment';
+    case AdReward = 'ad_reward';
+    case AdRevenue = 'ad_revenue';
 
     public function label(): string
     {
@@ -20,6 +22,8 @@ enum TransactionType: string
             self::PlatformFee => 'Platform fee',
             self::TaskEscrow => 'Task budget reserved',
             self::TaskPayment => 'Task payment',
+            self::AdReward => 'Ad revenue share',
+            self::AdRevenue => 'Ad network payout',
             default => ucfirst($this->value),
         };
     }
